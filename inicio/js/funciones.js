@@ -1,66 +1,47 @@
 "use strict";
 
+// --- CONSTANTES ---
 const cantidadPersonajes = 50;
 const gravedad = 900;
 const velocidadConParacaidas = 110;
 const altoPersonaje = 80;
 
 const FPS = 60;
-const INTERVALO_MS = 2000 / FPS;
+const INTERVALO_MS = 2000 / FPS; // 1000ms / 60fps ≈ 16.6ms
 const DELTA_SEGUNDOS = 1 / FPS;
 
+// --- ESTADO DEL JUEGO ---
 let personajesEnJuego = [];
 let intervaloId = null;
 let personajesCompletados = 0;
 let salvados = 0;
 let estrellados = 0;
 
-const estrelladoss = document.querySelector("#estrellados");
-const resueltos = document.querySelector("#resueltos")
-
-export function paracaidasPersonaje() {
-    if (estadoActual === "cayendo") {
-        estadoActual = "paracaidas";
-        divPersonajes.innerHTML = `<img src="./img/paracaidas.gif" alt="paracaidas" class="personaje">`;
-    }
-}
-
-divPersonajes.addEventListener("click", paracaidasPersonaje);
-const empezar = document.querySelector("#iniciar");
-const panel = document.querySelector("#panel-inicio");
-const divPersonajes = document.querySelector("#personajes");
-const botonHistorial = document.querySelector("#ver-historial")
-const historial = document.querySelector("#historial")
-const cerrarHistorial = document.querySelector("#cerrar-historial")
-
-botonHistorial.addEventListener("click", function(){
-    historial.classList.add("mostrar")
-})
-
-cerrarHistorial.addEventListener("click", function(){
-    historial.classList.remove("mostrar");
-})
-
-export function comprobarLlegadaAlSuelo() {
-    const posicionPersonaje = divPersonajes.offsetTop;
-    const altoEscenario = escenario.offsetHeight;
-
-    if (posicionPersonaje >= altoEscenario) {
-        if (estadoActual === "paracaidas") {
-            divPersonajes.innerHTML = `<img src="./img/salvado.gif" alt="salvado" class="personaje">`;
-            estadoActual = "salvado";
-            salvados++;
-            resueltos.textContent = salvados;
-
-        } else if (estadoActual === "cayendo") {
-            divPersonajes.innerHTML = `<img src="./img/estrellado.gif" alt="estrellado" class="personaje">`;
-            estadoActual = "estrellado";
-            estrellados++;
-            estrelladoss.textContent = estrellados;
+// --- ELEMENTOS DEL DOM ---
 const divPersonajes = document.querySelector("#personajes");
 const escenario = document.querySelector("#escenario");
 const suelo = document.querySelector("#suelo");
+const estrelladoss = document.querySelector("#estrellados");
+const resueltos = document.querySelector("#resueltos");
+const empezar = document.querySelector("#iniciar");
+const botonHistorial = document.querySelector("#ver-historial");
+const historial = document.querySelector("#historial");
+const cerrarHistorial = document.querySelector("#cerrar-historial");
 
+// --- EVENTOS DEL HISTORIAL ---
+if (botonHistorial && historial) {
+    botonHistorial.addEventListener("click", function () {
+        historial.classList.add("mostrar");
+    });
+}
+
+if (cerrarHistorial && historial) {
+    cerrarHistorial.addEventListener("click", function () {
+        historial.classList.remove("mostrar");
+    });
+}
+
+// --- CREACIÓN DE DATOS Y ELEMENTOS ---
 export function objPersonajes() {
     const anchoDisponible = Math.max(0, (escenario?.clientWidth || 0) - 64);
     return Array.from({ length: cantidadPersonajes }, (_, id) => ({
@@ -94,6 +75,7 @@ function crearElementosDOM() {
     });
 }
 
+// --- BUCLE PRINCIPAL Y LÓGICA DE FÍSICAS ---
 function actualizarCaida() {
     if (!escenario || !suelo) return;
     const limiteY = Math.max(0, escenario.clientHeight - suelo.offsetHeight - altoPersonaje);
@@ -112,20 +94,24 @@ function actualizarCaida() {
 
         personaje.y = Math.min(limiteY, personaje.y + personaje.velocidad * DELTA_SEGUNDOS);
 
+        // Comprobar si tocó el suelo
         if (personaje.y >= limiteY) {
             if (personaje.elemento) {
                 if (personaje.estado === "paracaidas") {
                     personaje.elemento.src = "./img/salvado.gif";
                     salvados++;
+                    if (resueltos) resueltos.textContent = salvados;
                 } else {
                     personaje.elemento.src = "./img/estrellado.gif";
                     estrellados++;
+                    if (estrelladoss) estrelladoss.textContent = estrellados;
                 }
             }
             personaje.estado = "en-suelo";
             personaje.velocidad = 0;
             personajesCompletados++;
 
+            // Activar al siguiente personaje
             const siguiente = personajesEnJuego.find((p) => p.estado === "esperando");
             if (siguiente) {
                 siguiente.estado = "cayendo";
@@ -138,12 +124,14 @@ function actualizarCaida() {
         }
     }
 
+    // Comprobar fin de juego
     if (personajesCompletados >= personajesEnJuego.length) {
         clearInterval(intervaloId);
         intervaloId = null;
     }
 }
 
+// --- INTERACCIÓN DEL JUGADOR ---
 export function paracaidasPersonaje(evento) {
     const elemento = evento.target.closest(".personaje");
     if (!elemento) return;
@@ -158,18 +146,28 @@ export function paracaidasPersonaje(evento) {
     if (personaje.elemento) personaje.elemento.src = "./img/paracaidas.gif";
 }
 
-export function personajes() {
+// --- INICIALIZACIÓN ---
+export function iniciarJuego() {
     if (intervaloId !== null) clearInterval(intervaloId);
 
     salvados = 0;
     estrellados = 0;
     personajesCompletados = 0;
+
+    if (resueltos) resueltos.textContent = salvados;
+    if (estrelladoss) estrelladoss.textContent = estrellados;
+
     personajesEnJuego = objPersonajes();
     crearElementosDOM();
 
     intervaloId = setInterval(actualizarCaida, INTERVALO_MS);
 }
 
+// Escuchador para desplegar el paracaídas mediante delegación de eventos
 if (divPersonajes) {
     divPersonajes.addEventListener("click", paracaidasPersonaje);
+}
+
+if (empezar) {
+    empezar.addEventListener("click", iniciarJuego);
 }

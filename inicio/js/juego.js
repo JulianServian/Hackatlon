@@ -1,6 +1,6 @@
 "use strict";
 
-import { personajes, paracaidasPersonaje } from "./funciones.js";
+import { paracaidasPersonaje } from "./funciones.js";
 
 const empezar = document.querySelector("#iniciar");
 const panel = document.querySelector("#panel-inicio");
@@ -27,7 +27,6 @@ export function botonEmpezar() {
                 panel.classList.remove("mostrar");
                 panel.classList.add("oculto");
             }
-            personajes();
         });
     }
 }
