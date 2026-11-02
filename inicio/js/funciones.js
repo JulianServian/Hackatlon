@@ -2,6 +2,9 @@ let estadoActual = "cayendo";
 let salvados = 0;
 let estrellados = 0;
 
+const estrelladoss = document.querySelector("#estrellados");
+const resueltos = document.querySelector("#resueltos")
+
 export function paracaidasPersonaje() {
     if (estadoActual === "cayendo") {
         estadoActual = "paracaidas";
@@ -20,10 +23,13 @@ export function comprobarLlegadaAlSuelo() {
             divPersonajes.innerHTML = `<img src="./img/salvado.gif" alt="salvado" class="personaje">`;
             estadoActual = "salvado";
             salvados++;
+            resueltos.textContent = salvados;
+
         } else if (estadoActual === "cayendo") {
             divPersonajes.innerHTML = `<img src="./img/estrellado.gif" alt="estrellado" class="personaje">`;
             estadoActual = "estrellado";
             estrellados++;
+            estrelladoss.textContent = estrellados;
         }
     }
 }
