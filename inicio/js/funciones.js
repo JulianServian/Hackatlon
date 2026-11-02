@@ -88,15 +88,40 @@ const estrellados = document.querySelector("#estrellados")
 const dificultad = document.querySelector("#dificultad").value
 
 export function localPartida(){
+    const ahora = new Date().toLocaleDateString();
+    const estrellados = document.querySelector("#estrellados").textContent || 0;
+    const dificultad = document.querySelector("#dificultad").value;
+
     const partida = [
         {nombre: "Ivan", fecha: ahora, puntos: 100, impactos: estrellados, dificultad: dificultad}
-    ]
-    const textoPartida = JSON.stringify(partida);
-    localStorage.getItem("local")
-    localStorage.setItem("miPartida", textoPartida)
-    const recu = localStorage.getItem("miPartida")
-    historial.insertAdjacentHTML("beforeend", recu);
-}
+    ];
 
+    const textoPartida = JSON.stringify(partida);
+    localStorage.setItem("miPartida", textoPartida);
+    const tablaHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Fecha</th>
+                    <th>Puntos</th>
+                    <th>Impactos</th>
+                    <th>Dificultad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>${partida[0].nombre}</td>
+                    <td>${partida[0].fecha}</td>
+                    <td>${partida[0].puntos}</td>
+                    <td>${partida[0].impactos}</td>
+                    <td>${partida[0].dificultad}</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+
+    historial.innerHTML = tablaHTML;
+}
 localPartida();
 botonEmpezar();
