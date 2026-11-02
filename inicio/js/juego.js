@@ -1,37 +1,41 @@
-// Guardo los elementos que voy a necesitar para manejar la partida y el historial.
+// Elementos del DOM
 const empezar = document.querySelector("#iniciar");
 const panel = document.querySelector("#panel-inicio");
 const divPersonajes = document.querySelector("#personajes");
 const escenario = document.querySelector("#escenario");
 const suelo = document.querySelector("#suelo");
-const botonHistorial = document.querySelector("#ver-historial")
-const historial = document.querySelector("#historial")
-const cerrarHistorial = document.querySelector("#cerrar-historial")
+const botonHistorial = document.querySelector("#ver-historial");
+const historial = document.querySelector("#historial");
+const cerrarHistorial = document.querySelector("#cerrar-historial");
 
-// Defino los valores que uso para crear y mover a los paracaidistas.
+// Configuración de físicas
 const cantidadPersonajes = 50;
 const gravedad = 900;
 const velocidadConParacaidas = 110;
 const altoPersonaje = 80;
 
-// Mantengo aquí el estado de cada personaje y del movimiento de la partida.
+// Configuración del bucle con Interval
+const FPS = 60;
+const INTERVALO_MS = 1000 / FPS;
+const DELTA_SEGUNDOS = 1 / FPS;
+
+// Estado global
 let personajesEnJuego = [];
-let intervaloCaida = null;
+let intervaloId = null;
 let personajesCompletados = 0;
 
-// Abro y cierro el historial cuando pulso sus botones.
-botonHistorial.addEventListener("click", function(){
-    historial.classList.add("mostrar")
-})
+// Gestores del panel de historial
+if (botonHistorial && historial) {
+    botonHistorial.addEventListener("click", () => historial.classList.add("mostrar"));
+}
+if (cerrarHistorial && historial) {
+    cerrarHistorial.addEventListener("click", () => historial.classList.remove("mostrar"));
+}
 
-cerrarHistorial.addEventListener("click", function(){
-    historial.classList.remove("mostrar");
-})
-
-// Creo los personajes y les asigno una posición aleatoria dentro del escenario.
-export function objPersonajes(){
+// 1. Inicializa el array de personajes
+export function objPersonajes() {
     const anchoDisponible = Math.max(0, escenario.clientWidth - 64);
-    return Array.from({length: cantidadPersonajes}, (_, id) => ({
+    return Array.from({ length: cantidadPersonajes }, (_, id) => ({
         id,
         x: Math.random() * anchoDisponible,
         y: 0,
@@ -41,118 +45,110 @@ export function objPersonajes(){
     }));
 }
 
-// Inicio una partida nueva y pongo en marcha la actualización de la caída.
-export function personajes(){
-    // Si ya había una partida en marcha, detengo su intervalo antes de empezar otra.
-    if (intervaloCaida !== null) clearInterval(intervaloCaida);
+// 2. Crea los elementos HTML una sola vez en el DOM
+function crearElementosDOM() {
+    divPersonajes.innerHTML = "";
+    personajesEnJuego.forEach(personaje => {
+        const img = document.createElement("img");
+        img.className = "personaje";
+        img.dataset.id = personaje.id;
+        img.src = "./img/cayendo.gif";
+        img.style.position = "absolute";
+        img.style.left = `${personaje.x}px`;
+        img.style.top = `${personaje.y}px`;
+        
+        if (personaje.estado === "esperando") {
+            img.style.display = "none";
+        }
+
+        divPersonajes.appendChild(img);
+        personaje.elemento = img; // Guardamos la referencia directa al nodo DOM
+    });
+}
+
+// 3. Inicia la partida y arranca la animación con setInterval
+export function personajes() {
+    if (intervaloId !== null) {
+        clearInterval(intervaloId);
+        intervaloId = null;
+    }
+
     personajesEnJuego = objPersonajes();
     personajesCompletados = 0;
-    pintarPersonajes();
+    crearElementosDOM();
 
-    // Actualizo el movimiento aproximadamente cada 16 milisegundos.
-    intervaloCaida = setInterval(actualizarCaida, 16);
+    intervaloId = setInterval(actualizarCaida, INTERVALO_MS);
 }
 
-// Dibujo cada personaje con la imagen que corresponde a su estado.
-function pintarPersonajes(){
-    divPersonajes.innerHTML = personajesEnJuego.map(personaje => {
-        const imagen = personaje.estado === "paracaidas"
-            ? "./img/paracaidas.gif"
-            : "./img/cayendo.gif";
-
-        // Mientras espera su turno, dejo al personaje oculto.
-        const oculto = personaje.estado === "esperando" ? "hidden" : "";
-        return `<img class="personaje" data-id="${personaje.id}" src="${imagen}" alt="" style="left: ${personaje.x}px; top: ${personaje.y}px" ${oculto}>`;
-    }).join("");
-}
-
-// Actualizo la velocidad y la posición de los personajes que están cayendo.
-function actualizarCaida(){
-    // Uso el tiempo aproximado entre actualizaciones para calcular el movimiento.
-    const delta = 0.016;
-    // Calculo dónde empieza el suelo para que los personajes no lo atraviesen.
+// 4. Bucle principal de actualización
+function actualizarCaida() {
     const limiteSuelo = escenario.clientHeight - suelo.offsetHeight;
+    const limiteY = Math.max(0, limiteSuelo - altoPersonaje);
 
     for (const personaje of personajesEnJuego) {
-        // No muevo a quienes ya aterrizaron o todavía están esperando su turno.
         if (personaje.estado === "en-suelo" || personaje.estado === "esperando") continue;
 
-        // Resto la altura del personaje para que aterrice justo sobre el suelo.
-        const limiteY = Math.max(0, limiteSuelo - altoPersonaje);
+        // Físicas según el estado
         if (personaje.estado === "cayendo") {
-            // Aumento la velocidad de caída usando la gravedad.
-            personaje.velocidad += gravedad * delta;
+            personaje.velocidad += gravedad * DELTA_SEGUNDOS;
         } else if (personaje.estado === "paracaidas") {
-            // Con el paracaídas, limito la velocidad para que caiga más despacio.
             personaje.velocidad = Math.min(
-                personaje.velocidad + gravedad * delta,
+                personaje.velocidad + gravedad * DELTA_SEGUNDOS,
                 velocidadConParacaidas
             );
         }
 
-        // Avanzo al personaje sin dejar que pase del límite de aterrizaje.
-        personaje.y = Math.min(limiteY, personaje.y + personaje.velocidad * delta);
+        // Posición
+        personaje.y = Math.min(limiteY, personaje.y + personaje.velocidad * DELTA_SEGUNDOS);
 
+        // Aterrizaje
         if (personaje.y >= limiteY) {
-            // Marco que aterrizó y preparo al siguiente personaje de la fila.
             personaje.estado = "en-suelo";
             personaje.velocidad = 0;
             personajesCompletados++;
 
-            // Hago que empiece a caer el primer personaje que sigue esperando.
-            for (const siguiente of personajesEnJuego) {
-                if (siguiente.estado === "esperando") {
-                    siguiente.estado = "cayendo";
-                    break;
-                }
+            // Mostrar el siguiente personaje en espera
+            const siguiente = personajesEnJuego.find(p => p.estado === "esperando");
+            if (siguiente) {
+                siguiente.estado = "cayendo";
+                siguiente.elemento.style.display = "block";
             }
         }
+
+        // Actualización directa de la vista (DOM) sin regenerar el HTML
+        personaje.elemento.style.top = `${personaje.y}px`;
     }
 
-    // Vuelvo a dibujar los personajes en sus posiciones actualizadas.
-    pintarPersonajes();
-
-    // Cuando todos aterrizan, detengo el intervalo para terminar la caída.
-    if (personajesCompletados === personajesEnJuego.length) {
-        clearInterval(intervaloCaida);
-        intervaloCaida = null;
+    // Detener el intervalo cuando todos hayan completado el recorrido
+    if (personajesCompletados >= personajesEnJuego.length) {
+        clearInterval(intervaloId);
+        intervaloId = null;
     }
 }
 
-// Empiezo la partida cuando pulso el botón de inicio.
-export function botonEmpezar(){
-    empezar.addEventListener("click", function(){
-        panel.classList.remove("mostrar")
-        panel.classList.add("oculto")
-        personajes();
-    })
-}
-
-// Abro el paracaídas del personaje que pulso si todavía está cayendo.
-export function paracaidasPersonaje(evento){
-    // Leo el identificador de la imagen pulsada y busco su personaje.
+// 5. Escuchador de clics para desplegar el paracaídas
+export function paracaidasPersonaje(evento) {
     const id = Number(evento.target.dataset.id);
     const personaje = personajesEnJuego.find(item => item.id === id);
+
     if (!personaje || personaje.estado !== "cayendo") return;
 
-    // Cambio su estado y reduzco la velocidad antes de volver a dibujarlo.
     personaje.estado = "paracaidas";
     personaje.velocidad = Math.min(personaje.velocidad, velocidadConParacaidas);
-    pintarPersonajes();
+    personaje.elemento.src = "./img/paracaidas.gif";
 }
 
-// Escucho los clics sobre la zona donde aparecen los personajes.
 divPersonajes.addEventListener("click", paracaidasPersonaje);
 
-// Dejo preparado el botón para que el jugador pueda iniciar la partida.
-botonEmpezar();
-import {botonEmpezar} from "./funciones.js";
-import {personajes} from "./funciones.js";
-import {objPersonajes} from "./funciones.js";
-import {localPartida} from "./funciones.js";
-"use strict";
+// 6. Botón de inicio
+export function botonEmpezar() {
+    if (empezar) {
+        empezar.addEventListener("click", function () {
+            panel.classList.remove("mostrar");
+            panel.classList.add("oculto");
+            personajes();
+        });
+    }
+}
 
-/* Todo el JavaScript del juego va aquí.
- * Acordad en el equipo quién programa cada parte (ver EMPIEZA_AQUI.md).
- * Podéis dejarlo en un solo archivo o partirlo en varios si os resulta más fácil con Git.
- */
+botonEmpezar();
