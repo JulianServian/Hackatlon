@@ -1,3 +1,5 @@
+"use strict";
+
 import { personajes, paracaidasPersonaje } from "./funciones.js";
 
 const empezar = document.querySelector("#iniciar");
@@ -7,7 +9,6 @@ const botonHistorial = document.querySelector("#ver-historial");
 const historial = document.querySelector("#historial");
 const cerrarHistorial = document.querySelector("#cerrar-historial");
 
-// Gestores del panel de historial
 if (botonHistorial && historial) {
     botonHistorial.addEventListener("click", () => historial.classList.add("mostrar"));
 }
