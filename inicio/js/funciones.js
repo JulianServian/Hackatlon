@@ -21,12 +21,13 @@ let estrellados = 0;
 const divPersonajes = document.querySelector("#personajes");
 const escenario = document.querySelector("#escenario");
 const suelo = document.querySelector("#suelo");
-const estrelladoss = document.querySelector("#estrellados");
+const estrelladoss = document.querySelector("#estrelladoss");
 const resueltos = document.querySelector("#resueltos");
 const empezar = document.querySelector("#iniciar");
 const botonHistorial = document.querySelector("#ver-historial");
 const historial = document.querySelector("#historial");
 const cerrarHistorial = document.querySelector("#cerrar-historial");
+const salvadoss = document.querySelector("#salvados")
 
 // --- EVENTOS DEL HISTORIAL ---
 if (botonHistorial && historial) {
@@ -94,17 +95,19 @@ function actualizarCaida() {
 
         personaje.y = Math.min(limiteY, personaje.y + personaje.velocidad * DELTA_SEGUNDOS);
 
-        // Comprobar si tocó el suelo
         if (personaje.y >= limiteY) {
             if (personaje.elemento) {
                 if (personaje.estado === "paracaidas") {
                     personaje.elemento.src = "./img/salvado.gif";
                     salvados++;
-                    if (resueltos) resueltos.textContent = salvados;
+                    if (salvadoss) salvadoss.textContent = salvados;
                 } else {
                     personaje.elemento.src = "./img/estrellado.gif";
                     estrellados++;
                     if (estrelladoss) estrelladoss.textContent = estrellados;
+                    if(estrellados > 2){
+                        alert("Game Over");
+                    }
                 }
             }
             personaje.estado = "en-suelo";
