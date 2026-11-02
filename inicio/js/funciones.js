@@ -80,6 +80,6 @@ export function paracaidasPersonaje(){
     }
 }
 
-personajes.addEventListener("click", paracaidasPersonaje);
+divPersonajes.addEventListener("click", paracaidasPersonaje);
 
 botonEmpezar();
