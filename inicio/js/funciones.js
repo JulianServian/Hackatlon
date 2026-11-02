@@ -83,14 +83,20 @@ export function botonEmpezar(){
     })
 }
 
+const ahora = new Date();
+const estrellados = document.querySelector("#estrellados")
+const dificultad = document.querySelector("#dificultad").value
 
-export function paracaidasPersonaje(){
-    if(divPersonajes == estado["cayendo"]){
-        divPersonajes.innerHTML += `<img src="./img/paracaidas.gif" alt"" class="personaje">`
-        estado["cayendo"] = estado["paracaidas"];
-    }
+export function localPartida(){
+    const partida = [
+        {nombre: "Ivan", fecha: ahora, puntos: 100, impactos: estrellados, dificultad: dificultad}
+    ]
+    const textoPartida = JSON.stringify(partida);
+    localStorage.getItem("local")
+    localStorage.setItem("miPartida", textoPartida)
+    const recu = localStorage.getItem("miPartida")
+    historial.insertAdjacentHTML("beforeend", recu);
 }
 
-divPersonajes.addEventListener("click", paracaidasPersonaje);
-
+localPartida();
 botonEmpezar();

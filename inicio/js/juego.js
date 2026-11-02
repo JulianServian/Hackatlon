@@ -1,8 +1,7 @@
 import {botonEmpezar} from "./funciones.js";
 import {personajes} from "./funciones.js";
 import {objPersonajes} from "./funciones.js";
-
-import {paracaidasPersonaje} from "./funciones.js";
+import {localPartida} from "./funciones.js";
 "use strict";
 
 /* Todo el JavaScript del juego va aquí.
