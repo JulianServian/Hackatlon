@@ -12,6 +12,8 @@ const DELTA_SEGUNDOS = 1 / FPS;
 let personajesEnJuego = [];
 let intervaloId = null;
 let personajesCompletados = 0;
+let salvados = 0;
+let estrellados = 0;
 
 const divPersonajes = document.querySelector("#personajes");
 const escenario = document.querySelector("#escenario");
@@ -70,9 +72,13 @@ function actualizarCaida() {
 
         if (personaje.y >= limiteY) {
             if (personaje.elemento) {
-                personaje.elemento.src = personaje.estado === "paracaidas" 
-                    ? "./img/salvado.gif" 
-                    : "./img/estrellado.gif";
+                if (personaje.estado === "paracaidas") {
+                    personaje.elemento.src = "./img/salvado.gif";
+                    salvados++;
+                } else {
+                    personaje.elemento.src = "./img/estrellado.gif";
+                    estrellados++;
+                }
             }
             personaje.estado = "en-suelo";
             personaje.velocidad = 0;
@@ -96,16 +102,6 @@ function actualizarCaida() {
     }
 }
 
-export function personajes() {
-    if (intervaloId !== null) clearInterval(intervaloId);
-
-    personajesEnJuego = objPersonajes();
-    personajesCompletados = 0;
-    crearElementosDOM();
-
-    intervaloId = setInterval(actualizarCaida, INTERVALO_MS);
-}
-
 export function paracaidasPersonaje(evento) {
     const elemento = evento.target.closest(".personaje");
     if (!elemento) return;
@@ -118,4 +114,20 @@ export function paracaidasPersonaje(evento) {
     personaje.estado = "paracaidas";
     personaje.velocidad = Math.min(personaje.velocidad, velocidadConParacaidas);
     if (personaje.elemento) personaje.elemento.src = "./img/paracaidas.gif";
+}
+
+export function personajes() {
+    if (intervaloId !== null) clearInterval(intervaloId);
+
+    salvados = 0;
+    estrellados = 0;
+    personajesCompletados = 0;
+    personajesEnJuego = objPersonajes();
+    crearElementosDOM();
+
+    intervaloId = setInterval(actualizarCaida, INTERVALO_MS);
+}
+
+if (divPersonajes) {
+    divPersonajes.addEventListener("click", paracaidasPersonaje);
 }
