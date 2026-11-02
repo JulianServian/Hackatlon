@@ -51,7 +51,6 @@ export function botonEmpezar(){
 }
 
 const ahora = new Date();
-const estrellados = document.querySelector("#estrellados")
 const dificultad = document.querySelector("#dificultad").value
 
 export function localPartida(){
