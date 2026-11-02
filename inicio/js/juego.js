@@ -146,3 +146,13 @@ divPersonajes.addEventListener("click", paracaidasPersonaje);
 
 // Dejo preparado el botón para que el jugador pueda iniciar la partida.
 botonEmpezar();
+import {botonEmpezar} from "./funciones.js";
+import {personajes} from "./funciones.js";
+import {objPersonajes} from "./funciones.js";
+import {localPartida} from "./funciones.js";
+"use strict";
+
+/* Todo el JavaScript del juego va aquí.
+ * Acordad en el equipo quién programa cada parte (ver EMPIEZA_AQUI.md).
+ * Podéis dejarlo en un solo archivo o partirlo en varios si os resulta más fácil con Git.
+ */
