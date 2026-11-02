@@ -1,5 +1,3 @@
-"use strict";
-
 // Configuración de físicas y tiempos
 const cantidadPersonajes = 50;
 const gravedad = 900;
