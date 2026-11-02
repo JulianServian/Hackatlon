@@ -83,4 +83,20 @@ export function botonEmpezar(){
     })
 }
 
+const ahora = new Date();
+const estrellados = document.querySelector("#estrellados")
+const dificultad = document.querySelector("#dificultad").value
+
+export function localPartida(){
+    const partida = [
+        {nombre: "Ivan", fecha: ahora, puntos: 100, impactos: estrellados, dificultad: dificultad}
+    ]
+    const textoPartida = JSON.stringify(partida);
+    localStorage.getItem("local")
+    localStorage.setItem("miPartida", textoPartida)
+    const recu = localStorage.getItem("miPartida")
+    historial.insertAdjacentHTML("beforeend", recu);
+}
+
+localPartida();
 botonEmpezar();
