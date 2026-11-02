@@ -5,7 +5,7 @@ const velocidadConParacaidas = 110;
 const altoPersonaje = 80;
 
 const FPS = 60;
-const INTERVALO_MS = 1000 / FPS; // Corregido a 1000ms para sincronicidad
+const INTERVALO_MS = 1500 / FPS; // Corregido a 1000ms para sincronicidad
 const DELTA_SEGUNDOS = 1 / FPS;
 
 // Estado interno del módulo
