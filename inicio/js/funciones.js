@@ -11,8 +11,7 @@ export function paracaidasPersonaje() {
 
 divPersonajes.addEventListener("click", paracaidasPersonaje);
 
-
-function comprobarLlegadaAlSuelo() {
+export function comprobarLlegadaAlSuelo() {
     const posicionPersonaje = divPersonajes.offsetTop;
     const altoEscenario = escenario.offsetHeight;
 
@@ -28,3 +27,4 @@ function comprobarLlegadaAlSuelo() {
         }
     }
 }
+
