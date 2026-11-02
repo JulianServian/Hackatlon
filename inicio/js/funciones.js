@@ -15,6 +15,48 @@ let personajesCompletados = 0;
 let salvados = 0;
 let estrellados = 0;
 
+const estrelladoss = document.querySelector("#estrellados");
+const resueltos = document.querySelector("#resueltos")
+
+export function paracaidasPersonaje() {
+    if (estadoActual === "cayendo") {
+        estadoActual = "paracaidas";
+        divPersonajes.innerHTML = `<img src="./img/paracaidas.gif" alt="paracaidas" class="personaje">`;
+    }
+}
+
+divPersonajes.addEventListener("click", paracaidasPersonaje);
+const empezar = document.querySelector("#iniciar");
+const panel = document.querySelector("#panel-inicio");
+const divPersonajes = document.querySelector("#personajes");
+const botonHistorial = document.querySelector("#ver-historial")
+const historial = document.querySelector("#historial")
+const cerrarHistorial = document.querySelector("#cerrar-historial")
+
+botonHistorial.addEventListener("click", function(){
+    historial.classList.add("mostrar")
+})
+
+cerrarHistorial.addEventListener("click", function(){
+    historial.classList.remove("mostrar");
+})
+
+export function comprobarLlegadaAlSuelo() {
+    const posicionPersonaje = divPersonajes.offsetTop;
+    const altoEscenario = escenario.offsetHeight;
+
+    if (posicionPersonaje >= altoEscenario) {
+        if (estadoActual === "paracaidas") {
+            divPersonajes.innerHTML = `<img src="./img/salvado.gif" alt="salvado" class="personaje">`;
+            estadoActual = "salvado";
+            salvados++;
+            resueltos.textContent = salvados;
+
+        } else if (estadoActual === "cayendo") {
+            divPersonajes.innerHTML = `<img src="./img/estrellado.gif" alt="estrellado" class="personaje">`;
+            estadoActual = "estrellado";
+            estrellados++;
+            estrelladoss.textContent = estrellados;
 const divPersonajes = document.querySelector("#personajes");
 const escenario = document.querySelector("#escenario");
 const suelo = document.querySelector("#suelo");
