@@ -1,5 +1,6 @@
 import {botonEmpezar} from "./funciones.js";
 import {personajes} from "./funciones.js";
+import {objPersonajes} from "./funciones.js";
 
 import {paracaidasPersonaje} from "./funciones.js";
 "use strict";

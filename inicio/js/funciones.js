@@ -1,6 +1,17 @@
 const empezar = document.querySelector("#iniciar");
 const panel = document.querySelector("#panel-inicio");
 const divPersonajes = document.querySelector("#personajes");
+const botonHistorial = document.querySelector("#ver-historial")
+const historial = document.querySelector("#historial")
+const cerrarHistorial = document.querySelector("#cerrar-historial")
+
+botonHistorial.addEventListener("click", function(){
+    historial.classList.add("mostrar")
+})
+
+cerrarHistorial.addEventListener("click", function(){
+    historial.classList.remove("mostrar");
+})
 
 export function objPersonajes(){
     const posX = Math.floor(Math.random() * 1236)
